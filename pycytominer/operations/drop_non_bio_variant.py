@@ -6,8 +6,9 @@ from pycytominer.cyto_utils.features import infer_cp_features
 
 def _parse_cellprofiler(feature):
     feature_lower = feature.lower()
-    if "areashape" in feature_lower and "boundingbox" in feature_lower:
-        return True
+    if "areashape" in feature_lower and "boundingbox" in feature_lower: return True
+    if "areashape" in feature_lower and "center" in feature_lower: return True
+    if "_location_" in feature_lower: return True
     return False
 
 def drop_non_bio_variant(population_df, features="infer", samples="all", drop_non_bio_variant_data_source=None):
