@@ -11,6 +11,7 @@ from pycytominer.cyto_utils import (
 )
 from pycytominer.operations import (
     correlation_threshold,
+    drop_non_bio_variant,
     get_na_columns,
     noise_removal,
     variance_threshold,
@@ -36,6 +37,7 @@ def feature_select(
     outlier_cutoff=500,
     noise_removal_perturb_groups=None,
     noise_removal_stdev_cutoff=None,
+    drop_non_bio_variant_data_source=None,
 ):
     """Performs feature selection based on the given operation.
 
@@ -91,6 +93,8 @@ def feature_select(
         Perturbation groups corresponding to rows in profiles or the the name of the metadata column containing this information.
     noise_removal_stdev_cutoff: float,optional
         Maximum mean feature standard deviation to be kept for noise removal, grouped by the identity of the perturbation from perturb_list. The data must already be normalized so that this cutoff can apply to all columns.
+    drop_non_bio_variant_data_source: string, optional
+        Name of software used to measure features. This is used to infer naming patterns of variant features.
 
     Returns
     -------
@@ -108,6 +112,7 @@ def feature_select(
         "blocklist",
         "drop_outliers",
         "noise_removal",
+        "drop_non_bio_variant",
     ]
 
     # Make sure the user provides a supported operation
@@ -175,6 +180,13 @@ def feature_select(
                 samples=samples,
                 noise_removal_perturb_groups=noise_removal_perturb_groups,
                 noise_removal_stdev_cutoff=noise_removal_stdev_cutoff,
+            )
+        elif op == "drop_non_bio_variant":
+            exclude = drop_non_bio_variant(
+                population_df=profiles,
+                features=features,
+                samples=samples,
+                drop_non_bio_variant_data_source=drop_non_bio_variant_data_source,
             )
         excluded_features += exclude
         features = [feat for feat in features if feat not in excluded_features]
